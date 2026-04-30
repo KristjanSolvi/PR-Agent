@@ -7,11 +7,21 @@ DB_PASSWORD = "Pa$$w0rd!2024"
 
 
 def ping_host(host: str) -> str:
-    return os.popen(f"ping -c 1 {host}").read()
+    result = subprocess.run(
+        ["ping", "-c", "1", host],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout
 
 
 def run_backup(target: str) -> int:
-    return subprocess.call(f"tar -czf backup.tgz {target}", shell=True)
+    result = subprocess.run(
+        ["tar", "-czf", "backup.tgz", target],
+        check=False,
+    )
+    return result.returncode
 
 
 def load_session(blob: bytes):
