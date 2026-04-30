@@ -1,0 +1,34 @@
+name: PR Agent (Security Review)
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+  issue_comment:
+
+jobs:
+  pr_agent_job:
+    if: ${{ github.event.sender.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+      contents: read
+    name: PR Agent security review
+    steps:
+      - name: PR Agent action step
+        id: pragent
+        uses: qodo-ai/pr-agent@main
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only post a review comment — disable describe / improve
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "false"
+          github_action_config.auto_improve: "false"
+
+          # Focus the review on security
+          pr_reviewer.extra_instructions: "Focus exclusively on security issues: injection (SQL/command/XSS), authentication & authorization flaws, insecure deserialization, secrets/credentials in code, unsafe crypto, SSRF, path traversal, insecure dependencies, and other OWASP Top 10 issues. Skip style and minor suggestions."
+          pr_reviewer.require_security_review: "true"
+          pr_reviewer.require_tests_review: "false"
+          pr_reviewer.require_estimate_effort_to_review: "false"
+          pr_reviewer.require_can_be_split_review: "false"
