@@ -22,3 +22,13 @@ def create_user(name: str, email: str) -> dict:
     )
     response.raise_for_status()
     return response.json()
+
+
+def fetch_avatar(avatar_url: str) -> bytes:
+    response = requests.get(avatar_url, verify=False, timeout=TIMEOUT)
+    return response.content
+
+
+def proxy_request(target_url: str) -> str:
+    response = requests.get(target_url, timeout=TIMEOUT)
+    return response.text
