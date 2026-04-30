@@ -21,12 +21,18 @@ jobs:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # Only post a review comment — disable describe / improve
+          # Run review (summary) and improve (inline suggestions); skip describe
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "false"
-          github_action_config.auto_improve: "false"
+          github_action_config.auto_improve: "true"
 
-          # Focus the review on security
+          # Make improve post INLINE committable suggestions on the diff
+          pr_code_suggestions.commitable_code_suggestions: "true"
+          pr_code_suggestions.focus_only_on_problems: "true"
+          pr_code_suggestions.extra_instructions: "Only flag security issues (injection, auth flaws, secrets in code, unsafe crypto, SSRF, path traversal, OWASP Top 10). Skip style/perf nitpicks."
+          pr_code_suggestions.num_code_suggestions_per_chunk: "3"
+
+          # Focus the review summary on security
           pr_reviewer.extra_instructions: "Focus exclusively on security issues: injection (SQL/command/XSS), authentication & authorization flaws, insecure deserialization, secrets/credentials in code, unsafe crypto, SSRF, path traversal, insecure dependencies, and other OWASP Top 10 issues. Skip style and minor suggestions."
           pr_reviewer.require_security_review: "true"
           pr_reviewer.require_tests_review: "false"
